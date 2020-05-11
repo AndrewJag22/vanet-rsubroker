@@ -1,6 +1,14 @@
 SUBINFO=/etc/certs/subjectinfo
 PASSFILE=/etc/certs/passwordfile
 
+
+#Creates the file containing the password for generating key and certificate
+echo "password" | sudo tee -a $PASSFILE > /dev/null
+
+#Creates the file containing the vehicle info for generating key and certificate
+echo "UK,Manchester,Greater,Manchester,vanet,vanet-broker,broker" | sudo tee -a $SUBINFO > /dev/null
+
+
 while IFS="," read -r f1 f2 f3 f4 f5 f6
 do
     CO="$f1"
