@@ -14,8 +14,8 @@ do
 done < "$SUBINFO"
 
 CERTDIR=/etc/certs
-FILE=/etc/certs/server.key
-FILE2=/etc/certs/server.csr
+FILE=/etc/certs/broker.key
+FILE2=/etc/certs/broker.csr
 
 if test -f "$CERTDIR"; then
     continue
