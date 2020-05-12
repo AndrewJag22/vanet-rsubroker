@@ -3,11 +3,14 @@ PASSFILE=/etc/certs/passwordfile
 
 
 #Creates the file containing the password for generating key and certificate
-echo "password" | sudo tee -a $PASSFILE > /dev/null
+if ! test -f "$PASSFILE"; then
+    echo "password" | sudo tee -a $PASSFILE > /dev/null
+fi
 
-#Creates the file containing the vehicle info for generating key and certificate
-echo "UK,Manchester,Greater,Manchester,vanet,vanet-broker,broker" | sudo tee -a $SUBINFO > /dev/null
-
+#Creates the file containing the broker info for generating key and certificate
+if ! test -f "$SUBINFO"; then
+    echo "UK,Manchester,Greater,Manchester,vanet,vanet-broker,brokerID" | sudo tee -a $SUBINFO > /dev/null
+fi
 
 while IFS="," read -r f1 f2 f3 f4 f5 f6
 do
@@ -26,9 +29,7 @@ FILE=/etc/certs/broker.key
 FILE2=/etc/certs/broker.csr
 
 if test -f "$CERTDIR"; then
-    continue
-else
-    sudo mkdir "$CERTDIR"
+    sudo mkdir "$CERTDIR"   
 fi
 
 if test -f "$FILE"; then
