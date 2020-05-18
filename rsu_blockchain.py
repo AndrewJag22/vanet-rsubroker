@@ -3,6 +3,7 @@ from flask import Flask, request
 import argparse, hashlib, json, time, ecdsa, requests
 from threading import Timer
 
+# Extracts Private and Public keys for blockchain use
 filename = "/etc/certs/blockchain_private_key"
 fd = open(filename, "r")
 private_key = ecdsa.SigningKey.from_string(bytes.fromhex(fd.read()), curve=ecdsa.SECP256k1)
@@ -85,8 +86,11 @@ class Blockchain:
             print("Block cannot be added because it is invalid")
             return False
         self.chain.append(block)
+
+        # Checks if the new block is being created by the node
         if announce:
             announce_new_block(block)
+
         print("New Block added to Blockchain")
         return True
 
@@ -94,6 +98,7 @@ class Blockchain:
     def get_last_block(self):
         return self.chain[-1]
 
+    # Checks validity of blockchain
     def check_chain_validity(self, chain):
         for block in chain:
             if not block.is_block_valid():
@@ -101,13 +106,12 @@ class Blockchain:
         return True
 
 
-
 app = Flask(__name__)
 
 # Initialize a blockchain object.
 blockchain = Blockchain()
 
-
+# Endpoint for adding new transactions which is referenced in the subscribe file
 @app.route('/new_transaction', methods=['POST'])
 def new_transaction():
     transaction_data = request.get_json()
@@ -117,6 +121,7 @@ def new_transaction():
 
     return "Success", 201
 
+# Endpoint for requesting blockchain
 @app.route('/chain', methods=['GET'])
 def get_chain():
     chain_data = []
@@ -150,10 +155,11 @@ def register_new_peers():
     data["peers"] = peers
     return json.dumps(data)
 
-
+# Endpoint to resgister node with existing node
 @app.route('/register_with', methods=['POST'])
 def register_with_existing_node():
 
+    # Gets node address of existing node from post request
     node_address = request.get_json()["node_address"]
     if not node_address:
         return "Invalid data", 400
@@ -169,18 +175,23 @@ def register_with_existing_node():
         global blockchain
         global peers
 
+        # Checks if node has been added to peers
         if not node_address in peers:
             peers.append(node_address)
             print(node_address, "has been added to peers")
+        
+        # Creates blockchain from acquired chain dump
         chain_dump = response.json()['chain']
         create_chain_from_dump(chain_dump)
 
+        # Adds peers from existing node's peers
         for peer in response.json()['peers']:
             if peer in peers or peer == request.url_root:
               continue  
 
             peers.append(peer)
 
+        # Registers node with other peers in the network
         data = {"node_address": request.host_url,
                 "registration_status": "True"}
         headers = {'Content-Type': "application/json"}
@@ -212,7 +223,7 @@ def create_chain_from_dump(chain_dump):
         else:
             blockchain.chain.append(block)
 
-
+# Endpoint for adding a new block to the chain
 @app.route('/add_block', methods=['POST'])
 def verify_and_add_block():
     block_data = request.get_json()['block']
@@ -229,7 +240,7 @@ def verify_and_add_block():
 
     return "Block added to the chain", 201
 
-
+# Announces new block that has been created
 def announce_new_block(block):
     block_data = {"block": block.__dict__}
     headers = {'Content-Type': "application/json"}
@@ -237,6 +248,7 @@ def announce_new_block(block):
         url = "{}/add_block".format(peer)
         requests.post(url, data=json.dumps(block_data), headers=headers)
 
+# Checks to see the longest chain the network
 def consensus():
     global blockchain
 
@@ -254,7 +266,7 @@ def consensus():
     if longest_chain:
         blockchain = longest_chain
 
-
+# Flask app settings
 if __name__ == "__main__":
     # app.debug = True
     app.run(host="0.0.0.0", port=5000)

@@ -11,7 +11,7 @@ python3 private_keygenerator.py
 crontab -l > current_cron
 cat >> current_cron << EOF
 @reboot python3 mqtt_subscriber_setup.py
-@reboot python3 rsublockchain.py
+@reboot python3 rsu_blockchain.py
 EOF
 crontab < current_cron
 rm -f current_cron
