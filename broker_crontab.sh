@@ -1,3 +1,9 @@
+BLOCKCHAINDIR=/etc/blockchain
+
+if test -f "$BLOCKCHAINDIR"; then
+    sudo mkdir "$BLOCKCHAINDIR"   
+fi
+
 # Generates private key used for blockchain
 python3 private_keygenerator.py
 
@@ -10,8 +16,17 @@ python3 private_keygenerator.py
 # Creates cron jobs to perform mqtt subscriber setup and run the blockchain whenever the server is put on
 crontab -l > current_cron
 cat >> current_cron << EOF
-@reboot python3 mqtt_subscriber_setup.py
-@reboot python3 rsu_blockchain.py
+@reboot /etc/blockchain/./sub_script.exp
+@reboot python3 /etc/blockchain/rsu_blockchain.py
 EOF
 crontab < current_cron
 rm -f current_cron
+
+# Creates copies of mqtt subscriber and blockchain executable files
+cp sub_script.exp /etc/blockchain/sub_script.exp
+cp mqtt_subscriber_setup.py /etc/blockchain/mqtt_subscriber_setup.py
+cp rsu_blockchain.py /etc/blockchain/rsu_blockchain.py
+
+# Starts up the mqtt subscriber and blockchain 
+/etc/blockchain/./sub_script.exp
+python3 /etc/blockchain/rsu_blockchain.py

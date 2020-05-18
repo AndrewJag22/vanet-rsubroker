@@ -4,4 +4,11 @@ This is the setup for the Road Side Units that will act as their own brokers for
 
 In the **broker_csr_key_gen.sh"" file, the password as well as subjectinfo details should be changed accordingly. The Common Name field in subjectinfo (CN) must match the name of broker that would be connected to. In testing, this can be the IP address of the broker.
 
-It should be noted that the SSL connection required by MQTT is only supported by Python 3.6.x and lower
+
+The sub_script.exp file should also have the password changed.
+
+It should be noted that the SSL connection required by MQTT is only supported by Python 3.6.x and lower.
+
+On downloading, the broker_crontab.sh file should be run as root using command:
+
+    sudo ./broker_crontab.sh
