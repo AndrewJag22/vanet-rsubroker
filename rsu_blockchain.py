@@ -1,10 +1,8 @@
 from flask import Flask, request
-
-import argparse, hashlib, json, time, ecdsa, requests
-from threading import Timer
+import hashlib, json, time, ecdsa, requests
 
 # Extracts Private and Public keys for blockchain use
-filename = "/etc/certs/blockchain_private_key"
+filename = "/etc/blockchain/blockchain_private_key"
 fd = open(filename, "r")
 private_key = ecdsa.SigningKey.from_string(bytes.fromhex(fd.read()), curve=ecdsa.SECP256k1)
 pub_key = private_key.get_verifying_key()
@@ -12,6 +10,7 @@ pub_key = private_key.get_verifying_key()
 class Transaction:
     def __init__(self, transaction):
         self.data = transaction["MessageBody"]
+        self.timestamp = transaction["timestamp"]
         
 
 class Block:
@@ -23,24 +22,24 @@ class Block:
     
     # Create hash of data block
     def calculate_hash(self):
-        self.hash = hashlib.sha256((self.timestamp.__str__() + json.dumps(self.transactions) + self.previous_hash).encode('utf-8')).hexdigest()
+        self.block_hash = hashlib.sha256((self.timestamp.__str__() + json.dumps(self.transactions) + self.previous_hash).encode('utf-8')).hexdigest()
 
-    def add_hash_and_signature(self, hash, signature):
-        self.hash = hash
-        self.block_signature = signature
+    def add_hash_and_signature(self, block_hash, block_signature):
+        self.block_hash = block_hash
+        self.block_signature = block_signature
 
     def sign_block(self, signing_key):
         # Compares value of verifying key generated to that of the public key
         if signing_key.get_verifying_key().to_string().hex() != self.block_creator_public_key:
             raise Exception("You cannot create block for another node")
-
-        # Signs the block to be added to the chain
-        self.block_signature = signing_key.sign(bytes(self.hash, 'utf-8')).hex()
+        else:
+            # Signs the block to be added to the chain
+            self.block_signature = signing_key.sign(bytes(self.block_hash, 'utf-8')).hex()
 
     def is_block_valid(self, last_block):
 
         # Compares the previous_hash value of the new block to the hash of the last block in the chain
-        if self.previous_hash != last_block.hash:
+        if self.previous_hash != last_block.block_hash:
             return False
 
         # Checks the presence of the signature value in the block
@@ -48,7 +47,7 @@ class Block:
             return False
 
         # Verifies the signature of the block hash    
-        return pub_key.verify(bytes.fromhex(self.block_signature), bytes(self.hash, 'utf-8'))
+        return pub_key.verify(bytes.fromhex(self.block_signature), bytes(self.block_hash, 'utf-8'))
 
 
 
@@ -72,7 +71,7 @@ class Blockchain:
 
         if(len(self.pending_transactions) == 5):
             consensus()
-            new_block = Block(time.time(), self.pending_transactions, pub_key.to_string().hex(), self.get_last_block().hash)
+            new_block = Block(time.time(), self.pending_transactions, pub_key.to_string().hex(), self.get_last_block().block_hash)
             new_block.calculate_hash()
             new_block.sign_block(private_key)
             self.add_block_to_chain(new_block, True)
@@ -111,6 +110,9 @@ app = Flask(__name__)
 # Initialize a blockchain object.
 blockchain = Blockchain()
 
+# Contains the host addresses of other participating members of the network
+peers = []
+
 # Endpoint for adding new transactions which is referenced in the subscribe file
 @app.route('/new_transaction', methods=['POST'])
 def new_transaction():
@@ -128,9 +130,6 @@ def get_chain():
     for block in blockchain.chain:
         chain_data.append(block.__dict__)
     return {"length": len(chain_data), "chain": chain_data}
-
-# Contains the host addresses of other participating members of the network
-peers = []
 
 # Endpoint to add new peers to the network
 @app.route('/register_node', methods=['POST'])
@@ -215,7 +214,7 @@ def create_chain_from_dump(chain_dump):
                       block_data["previous_hash"],
                       )
 
-        block.add_hash_and_signature(block_data["hash"], block_data["block_signature"])
+        block.add_hash_and_signature(block_data["block_hash"], block_data["block_signature"])
         if index > 0:
             added = blockchain.add_block_to_chain(block)
             if not added:
@@ -232,7 +231,7 @@ def verify_and_add_block():
                       block_data["block_creator_public_key"],
                       block_data["previous_hash"],
                       )
-    block.add_hash_and_signature(block_data["hash"], block_data["block_signature"])
+    block.add_hash_and_signature(block_data["block_hash"], block_data["block_signature"])
     added = blockchain.add_block_to_chain(block)
 
     if not added:
