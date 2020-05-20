@@ -1,3 +1,9 @@
+BLOCKCHAINDIR=/etc/blockchain
+
+if test -f "$BLOCKCHAINDIR"; then
+    sudo mkdir "$BLOCKCHAINDIR"   
+fi
+
 # Generates private key used for blockchain
 python3 private_key_generator.py
 
