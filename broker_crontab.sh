@@ -7,9 +7,9 @@ else
     echo "Created /etc/blockchain directory"
 fi
 
-# Adds executable attribute to scripts
-chmod +x broker_csr_key_gen.sh
-chmod +x mqttbrokerca.sh
+# Installing dependencies
+apt-get install -y python3-flask python3-pandas
+sudo -H pip3 install paho-mqtt
 
 # Generates private key used for blockchain
 python3 private_key_generator.py
@@ -25,6 +25,14 @@ cp broker.exp /etc/mosquitto/broker.exp
 cp sub_script.exp /etc/blockchain/sub_script.exp
 cp mqtt_subscriber_setup.py /etc/blockchain/mqtt_subscriber_setup.py
 cp rsu_blockchain.py /etc/blockchain/rsu_blockchain.py
+cp broker_csr_key_gen.sh /etc/certs/broker_csr_key_gen.sh
+cp mqttbrokerca.sh /etc/certs/mqttbrokerca.sh
+
+# Adds executable attribute to scripts
+chmod +x broker_csr_key_gen.sh
+chmod +x mqttbrokerca.sh
+chmod +x /etc/mosquitto/broker.exp
+chmod +x /etc/blockchain/sub_script.exp
 
 # Copies services to /lib/systemd/system folder
 cp rsu_blockchain.service /lib/systemd/system/rsu_blockchain.service
