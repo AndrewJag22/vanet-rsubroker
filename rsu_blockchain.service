@@ -1,0 +1,11 @@
+[Unit]
+Description=Blockchain Client
+After=multi-user.target
+
+[Service]
+user=user
+Type=simple
+ExecStart=/usr/bin/python3 /etc/blockchain/rsu_blockchain.py
+
+[Install]
+WantedBy=multi-user.target

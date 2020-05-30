@@ -1,0 +1,11 @@
+[Unit]
+Description=MQTT Broker 
+After=multi-user.target
+
+[Service]
+user=user
+Type=simple
+ExecStart=./broker.exp
+
+[Install]
+WantedBy=multi-user.target
