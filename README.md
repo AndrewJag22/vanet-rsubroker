@@ -11,4 +11,4 @@ It should be noted that the SSL connection required by MQTT is only supported by
 
 On downloading, the broker_crontab.sh file should be run as root using command:
 
-    sudo ./broker_crontab.sh
+    sudo bash ./broker_crontab.sh
