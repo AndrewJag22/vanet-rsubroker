@@ -5,7 +5,7 @@ After=multi-user.target
 [Service]
 user=user
 Type=simple
-ExecStart=./sub_script.exp
+ExecStart=/etc/blockchain/./sub_script.exp
 
 [Install]
 WantedBy=multi-user.target

@@ -21,7 +21,7 @@ python3 private_key_generator.py
 ./mqttbrokerca.sh
 
 # Creates copies of mqtt broker and subscriber and, blockchain executable files
-cp broker_server.exp /etc/mosquitto/./broker_server.exp
+cp broker.exp /etc/mosquitto/broker.exp
 cp sub_script.exp /etc/blockchain/sub_script.exp
 cp mqtt_subscriber_setup.py /etc/blockchain/mqtt_subscriber_setup.py
 cp rsu_blockchain.py /etc/blockchain/rsu_blockchain.py
