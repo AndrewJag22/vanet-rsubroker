@@ -1,5 +1,7 @@
 from flask import Flask, request
-import hashlib, json, time, ecdsa, requests
+import hashlib, json, time, ecdsa, requests, logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s', filename='/var/log/blockchain.log')
 
 # Extracts Private and Public keys for blockchain use
 filename = "/etc/blockchain/blockchain_private_key"
@@ -67,7 +69,7 @@ class Blockchain:
     def add_transactions(self, transaction):
         trans = Transaction(transaction)
         self.pending_transactions.append(trans.__dict__)
-        print("New transaction added")
+        logging.info("New transaction added")
 
         if(len(self.pending_transactions) == 5):
             consensus()
@@ -82,7 +84,7 @@ class Blockchain:
         last_block = self.get_last_block()
 
         if not block.is_block_valid(last_block):
-            print("Block cannot be added because it is invalid")
+            logging.info("Block cannot be added because it is invalid")
             return False
         self.chain.append(block)
 
@@ -90,7 +92,7 @@ class Blockchain:
         if announce:
             announce_new_block(block)
 
-        print("New Block added to Blockchain")
+        logging.info("New Block added to Blockchain")
         return True
 
     # Gets the last block present in the blockchain
@@ -143,8 +145,8 @@ def register_new_peers():
     # Add the node to the peer list
     if not node_address in peers:
         peers.append(node_address)
-        print(node_address, "has been added to peers")
-    
+        logging.info(node_address + " has been added to peers")
+     
     # Checks if node has been registered with another node
     if registration_status == "True":
         return "Peer has been registered by another"
@@ -177,7 +179,7 @@ def register_with_existing_node():
         # Checks if node has been added to peers
         if not node_address in peers:
             peers.append(node_address)
-            print(node_address, "has been added to peers")
+            logging.info(node_address + " has been added to peers")
         
         # Creates blockchain from acquired chain dump
         chain_dump = response.json()['chain']
