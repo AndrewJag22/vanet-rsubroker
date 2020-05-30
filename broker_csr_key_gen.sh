@@ -1,14 +1,20 @@
 SUBINFO=/etc/certs/subjectinfo
 PASSFILE=/etc/certs/passwordfile
+CERTDIR=/etc/certs
+FILE=/etc/certs/broker.key
+FILE2=/etc/certs/broker.csr
 
+if test -e "$CERTDIR"; then
+    sudo mkdir "$CERTDIR"   
+fi
 
-#Creates the file containing the password for generating key and certificate
-if ! test -f "$PASSFILE"; then
+# Creates the file containing the password for generating key and certificate
+if ! test -e "$PASSFILE"; then
     echo "password" | sudo tee -a $PASSFILE > /dev/null
 fi
 
-#Creates the file containing the broker info for generating key and certificate
-if ! test -f "$SUBINFO"; then
+# Creates the file containing the broker info for generating key and certificate
+if ! test -e "$SUBINFO"; then
     echo "UK,Manchester,Greater,Manchester,vanet,vanet-broker,brokerID" | sudo tee -a $SUBINFO > /dev/null
 fi
 
@@ -24,23 +30,17 @@ do
     echo "$CO $ST $LO $OR $OU $CN"
 done < "$SUBINFO"
 
-CERTDIR=/etc/certs
-FILE=/etc/certs/broker.key
-FILE2=/etc/certs/broker.csr
-
-if test -f "$CERTDIR"; then
-    sudo mkdir "$CERTDIR"   
-fi
-
-if test -f "$FILE"; then
-    echo "PEM file exists"
+if test -e "$FILE"; then
+    echo "Private key file exists"
     echo "**********Replacing file**********"
     sudo rm "$FILE"
     sudo rm "$FILE2"
     sudo openssl genrsa -des3 -out "$FILE" -passout file:$PASSFILE 2048
     sudo openssl req -out "$FILE2" -key "$FILE" -passin file:$PASSFILE -subj "/C=$CO/ST=$ST/L=$LO/O=$OR/OU=$OU/CN=$CN" -new
+    echo "Files have been replaced"
 else
-    echo "PEM file does not exist"
+    echo "Private key file does not exist"
     sudo openssl genrsa -des3 -out "$FILE" -passout file:$PASSFILE 2048
     sudo openssl req -out "$FILE2" -key "$FILE" -passin file:$PASSFILE -subj "/C=$CO/ST=$ST/L=$LO/O=$OR/OU=$OU/CN=$CN" -new
+    echo "Files has been created"
 fi
