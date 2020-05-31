@@ -8,7 +8,7 @@ else
 fi
 
 # Installing dependencies
-apt-get install -y python3-flask python3-pandas python3-ecdsa
+apt-get install -y mosquitto python3-flask python3-pandas python3-ecdsa
 sudo -H pip3 install paho-mqtt
 
 # Generates private key used for blockchain
