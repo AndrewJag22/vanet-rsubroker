@@ -1,4 +1,5 @@
 BLOCKCHAINDIR=/etc/blockchain
+CERTDIR=/etc/certs
 
 if test -e "$BLOCKCHAINDIR"; then
     echo "/etc/blockchain directory already exists"
@@ -7,18 +8,21 @@ else
     echo "Created /etc/blockchain directory"
 fi
 
+if test -e "$CERTDIR"; then
+    echo "/etc/certs directory already exists"
+else
+    mkdir "$CERTDIR"
+    echo "Created /etc/blockchain directory"
+fi
+
 # Installing dependencies
-apt-get install -y mosquitto python3-flask python3-pandas python3-ecdsa
+apt-get install -y mosquitto python3-flask python3-pandas python3-ecdsa sshpass python3-pip
 sudo -H pip3 install paho-mqtt
 
-# Generates private key used for blockchain
-python3 private_key_generator.py
-
-# Creates the broker's key and csr for mqtt connection
-./broker_csr_key_gen.sh
-
-# Sends the created crs to the CA for certification
-./mqttbrokerca.sh
+# Mosquitto broker configuration
+cd /etc/mosquitto
+echo -e "\nallow_anonymous false\n\nacl_file /etc/mosquitto/aclfile\n\nport 8883\n\n#ssl settings\ncafile /etc/certs/ca.crt\nkeyfile /etc/certs/broker.key\ncertfile /etc/certs/broker.crt\ntls_version tlsv1.2\n\nrequire_certificate true\nuse_identity_as_username true" >> mosquitto.conf
+echo -e "#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser <Broker IP>\ntopic readwrite vanet/messages" > aclfile
 
 # Creates copies of mqtt broker and subscriber and, blockchain executable files
 cp broker.exp /etc/mosquitto/broker.exp
@@ -31,8 +35,19 @@ cp mqttbrokerca.sh /etc/certs/mqttbrokerca.sh
 # Adds executable attribute to scripts
 chmod +x broker_csr_key_gen.sh
 chmod +x mqttbrokerca.sh
+chmod +x /etc/certs/broker_csr_key_gen.sh
+chmod +x /etc/certs/mqttbrokerca.sh
 chmod +x /etc/mosquitto/broker.exp
 chmod +x /etc/blockchain/sub_script.exp
+
+# Generates private key used for blockchain
+python3 private_key_generator.py
+
+# Creates the broker's key and csr for mqtt connection
+./broker_csr_key_gen.sh
+
+# Sends the created crs to the CA for certification
+./mqttbrokerca.sh
 
 # Copies services to /lib/systemd/system folder
 cp rsu_blockchain.service /lib/systemd/system/rsu_blockchain.service
