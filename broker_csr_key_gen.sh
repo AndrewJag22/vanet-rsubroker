@@ -1,12 +1,7 @@
 SUBINFO=/etc/certs/subjectinfo
 PASSFILE=/etc/certs/passwordfile
-CERTDIR=/etc/certs
 FILE=/etc/certs/broker.key
 FILE2=/etc/certs/broker.csr
-
-if ! test -e "$CERTDIR"; then
-    sudo mkdir "$CERTDIR"   
-fi
 
 # Creates the file containing the password for generating key and certificate
 if ! test -e "$PASSFILE"; then
