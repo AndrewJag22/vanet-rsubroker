@@ -16,7 +16,7 @@ else
 fi
 
 # Installing dependencies
-apt-get install -y mosquitto python3-flask python3-pandas python3-ecdsa sshpass python3-pip
+apt-get install -y mosquitto python3-flask python3-pandas python3-ecdsa sshpass python3-pip expect
 sudo -H pip3 install paho-mqtt
 
 # Creates copies of mqtt broker and subscriber and, blockchain executable files

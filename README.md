@@ -4,9 +4,11 @@ This is the setup for the Road Side Units that will act as their own brokers for
 
 In the **broker_csr_key_gen.sh** file, the password as well as subjectinfo details should be changed accordingly. The Common Name field in subjectinfo (CN) must match the name of broker that would be connected to. In testing, this can be the IP address of the broker.
 
-In the **mqttbrokerca.sh** file, the CAserverIP field will need an input. Before connecting to the CA server, it is necessary to do a manual ssh connection to verify the ssh host using the ECDSA key fingerprint and add to the CA server to known-hosts
+In the **mqttbrokerca.sh** file, the CAserverIP field will need an input. Before connecting to the CA server, it is necessary to do a manual ssh connection to verify the ssh host using the ECDSA key fingerprint and add to the CA server to known-hosts.
 
 The sub_script.exp file should also have the password changed.
+
+The created file **/etc/mosquitto/aclfile** should have the broker ID changed.
 
 It should be noted that the SSL connection required by MQTT is only supported by Python 3.6.x and lower.
 
