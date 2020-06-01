@@ -10,6 +10,6 @@ The sub_script.exp file should also have the password changed.
 
 It should be noted that the SSL connection required by MQTT is only supported by Python 3.6.x and lower.
 
-On downloading, the broker_crontab.sh file should be run as root using command:
+On downloading, the broker_setup.sh file should be run as root using command:
 
-    sudo bash ./broker_crontab.sh
+    sudo bash ./broker_setup.sh
