@@ -8,7 +8,8 @@ In the **mqttbrokerca.sh** file, the CAserverIP field will need an input. Before
 
 The sub_script.exp file should also have the password changed.
 
-The created file **/etc/mosquitto/aclfile** should have the broker ID changed.
+The created file **/etc/mosquitto/aclfile** should have the broker ID changed and the broker service should be restarted using:
+    systemctl restart broker.service
 
 It should be noted that the SSL connection required by MQTT is only supported by Python 3.6.x and lower.
 
