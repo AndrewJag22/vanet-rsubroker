@@ -12,17 +12,12 @@ if test -e "$CERTDIR"; then
     echo "/etc/certs directory already exists"
 else
     mkdir "$CERTDIR"
-    echo "Created /etc/blockchain directory"
+    echo "Created /etc/certs directory"
 fi
 
 # Installing dependencies
 apt-get install -y mosquitto python3-flask python3-pandas python3-ecdsa sshpass python3-pip
 sudo -H pip3 install paho-mqtt
-
-# Mosquitto broker configuration
-cd /etc/mosquitto
-echo -e "\nallow_anonymous false\n\nacl_file /etc/mosquitto/aclfile\n\nport 8883\n\n#ssl settings\ncafile /etc/certs/ca.crt\nkeyfile /etc/certs/broker.key\ncertfile /etc/certs/broker.crt\ntls_version tlsv1.2\n\nrequire_certificate true\nuse_identity_as_username true" >> mosquitto.conf
-echo -e "#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser <Broker IP>\ntopic readwrite vanet/messages" > aclfile
 
 # Creates copies of mqtt broker and subscriber and, blockchain executable files
 cp broker.exp /etc/mosquitto/broker.exp
@@ -53,6 +48,10 @@ python3 private_key_generator.py
 cp rsu_blockchain.service /lib/systemd/system/rsu_blockchain.service
 cp sub_script.service /lib/systemd/system/sub_script.service
 cp broker.service /lib/systemd/system/broker.service
+
+# Mosquitto broker configuration
+echo -e "\nallow_anonymous false\n\nacl_file /etc/mosquitto/aclfile\n\nport 8883\n\n#ssl settings\ncafile /etc/certs/ca.crt\nkeyfile /etc/certs/broker.key\ncertfile /etc/certs/broker.crt\ntls_version tlsv1.2\n\nrequire_certificate true\nuse_identity_as_username true" >> /etc/mosquitto/mosquitto.conf
+echo -e "#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser <Broker IP>\ntopic readwrite vanet/messages" > /etc/mosquitto/aclfile
 
 # Creates cron jobs to perform mqtt broker and subscriber setup and run the blockchain whenever the server is put on
 crontab -l > current_cron
