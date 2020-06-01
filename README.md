@@ -4,6 +4,7 @@ This is the setup for the Road Side Units that will act as their own brokers for
 
 In the **broker_csr_key_gen.sh** file, the password as well as subjectinfo details should be changed accordingly. The Common Name field in subjectinfo (CN) must match the name of broker that would be connected to. In testing, this can be the IP address of the broker.
 
+In the **mqttbrokerca.sh** file, the CAserverIP field will need an input
 
 The sub_script.exp file should also have the password changed.
 
