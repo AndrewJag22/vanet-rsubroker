@@ -8,11 +8,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: 
 
 # Connection parameters
 with open ("/etc/mqtt/ip_address", "r") as ip_address:
-    broker = ip_address.readline()
+    broker = ip_address.readline().rstrip('\n')
 port = 8883
 root_ca = "/etc/mqtt/ca.crt"
 client_crt = "/etc/mqtt/" + broker + ".crt"
-private_key = "/etc/mqtt/" + broker + "rsu.key"
+private_key = "/etc/mqtt/" + broker + ".key"
 topic = "vanet/messages"
 
 # Method called when a new message has been received from broker
