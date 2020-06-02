@@ -20,6 +20,10 @@ fi
 # Creates file containing RSU IP address
 echo "$RSUIP" > /etc/mqtt/ip_address
 
+# Adds CA Server to known hosts and makes sure there are no duplicates
+ssh-keygen -R $CASERVERIP
+ssh-keyscan -H $CASERVERIP >> ~/.ssh/known_hosts
+
 # Installing dependencies
 apt-get install -y mosquitto python3-flask python3-pandas python3-ecdsa sshpass python3-pip expect
 sudo -H pip3 install paho-mqtt
