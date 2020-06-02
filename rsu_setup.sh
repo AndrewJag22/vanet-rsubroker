@@ -24,25 +24,25 @@ cp broker.exp /etc/mosquitto/broker.exp
 cp sub_script.exp /etc/blockchain/sub_script.exp
 cp mqtt_subscriber_setup.py /etc/blockchain/mqtt_subscriber_setup.py
 cp rsu_blockchain.py /etc/blockchain/rsu_blockchain.py
-cp broker_csr_key_gen.sh /etc/certs/broker_csr_key_gen.sh
-cp mqttbrokerca.sh /etc/certs/mqttbrokerca.sh
+cp rsu_csr_key_gen.sh /etc/certs/rsu_csr_key_gen.sh
+cp mqttrsuca.sh /etc/certs/mqttrsuca.sh
 
 # Adds executable attribute to scripts
-chmod +x broker_csr_key_gen.sh
-chmod +x mqttbrokerca.sh
-chmod +x /etc/certs/broker_csr_key_gen.sh
-chmod +x /etc/certs/mqttbrokerca.sh
+chmod +x rsu_csr_key_gen.sh
+chmod +x mqttrsuca.sh
+chmod +x /etc/certs/rsu_csr_key_gen.sh
+chmod +x /etc/certs/mqttrsuca.sh
 chmod +x /etc/mosquitto/broker.exp
 chmod +x /etc/blockchain/sub_script.exp
 
 # Generates private key used for blockchain
 python3 private_key_generator.py
 
-# Creates the broker's key and csr for mqtt connection
-./broker_csr_key_gen.sh
+# Creates the rsu's key and csr for mqtt connection
+./rsu_csr_key_gen.sh
 
 # Sends the created crs to the CA for certification
-./mqttbrokerca.sh
+./mqttrsuca.sh
 
 # Copies services to /lib/systemd/system folder
 cp rsu_blockchain.service /lib/systemd/system/rsu_blockchain.service
