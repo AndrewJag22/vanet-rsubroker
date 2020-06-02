@@ -1,8 +1,9 @@
+RSUIP=
 SUBINFO=/etc/certs/subjectinfo
 PASSFILE=/etc/certs/passwordfile
-FILE=/etc/certs/broker.key
-FILE2=/etc/certs/broker.csr
-RSUIP=
+FILE=/etc/certs/$RSUIP.key
+FILE2=/etc/certs/$RSUIP.csr
+
 
 # Creates the file containing the password for generating key and certificate
 if ! test -e "$PASSFILE"; then
