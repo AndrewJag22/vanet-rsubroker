@@ -75,11 +75,15 @@ rm -f current_cron
 # Starts up the mqtt broker and subscriber and, blockchain services
 systemctl daemon-reload
 
-systemctl enable sub_script.service
-systemctl start sub_script.service
+systemctl enable broker.service
+systemctl start broker.service
 
 systemctl enable rsu_blockchain.service
 systemctl start rsu_blockchain.service
 
-systemctl enable broker.service
-systemctl start broker.service
+# Gives time for the broker service to be fully functional
+sleep 3
+
+systemctl enable sub_script.service
+systemctl start sub_script.service
+
