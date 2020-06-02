@@ -1,5 +1,6 @@
 BLOCKCHAINDIR=/etc/blockchain
 CERTDIR=/etc/certs
+RSUIP=
 
 if test -e "$BLOCKCHAINDIR"; then
     echo "/etc/blockchain directory already exists"
@@ -50,8 +51,8 @@ cp sub_script.service /lib/systemd/system/sub_script.service
 cp broker.service /lib/systemd/system/broker.service
 
 # Mosquitto broker configuration
-echo -e "\nallow_anonymous false\n\nacl_file /etc/mosquitto/aclfile\n\nport 8883\n\n#ssl settings\ncafile /etc/certs/ca.crt\nkeyfile /etc/certs/broker.key\ncertfile /etc/certs/broker.crt\ntls_version tlsv1.2\n\nrequire_certificate true\nuse_identity_as_username true" >> /etc/mosquitto/mosquitto.conf
-echo -e "#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser <Broker IP>\ntopic readwrite vanet/messages" > /etc/mosquitto/aclfile
+echo -e "\nallow_anonymous false\n\nacl_file /etc/mosquitto/aclfile\n\nport 8883\n\n#ssl settings\ncafile /etc/certs/ca.crt\nkeyfile /etc/certs/$RSUIP.key\ncertfile /etc/certs/$RSUIP.crt\ntls_version tlsv1.2\n\nrequire_certificate true\nuse_identity_as_username true" >> /etc/mosquitto/mosquitto.conf
+echo -e "#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser $RSUIP\ntopic readwrite vanet/messages" > /etc/mosquitto/aclfile
 
 # Creates cron jobs to perform mqtt broker and subscriber setup and run the blockchain whenever the server is put on
 crontab -l > current_cron

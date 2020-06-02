@@ -7,11 +7,11 @@ import concurrent.futures
 logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s', filename='/var/log/mqttsubscriber.log')
 
 # Connection parameters
-broker = "Broker ID"
+broker = "Broker IP"
 port = 8883
 root_ca = "/etc/certs/ca.crt"
-client_crt = "/etc/certs/rsu.crt"
-private_key = "/etc/certs/rsu.key"
+client_crt = "/etc/certs/" + broker + ".crt"
+private_key = "/etc/certs/" + broker + "rsu.key"
 topic = "vanet/messages"
 
 # Method called when a new message has been received from broker

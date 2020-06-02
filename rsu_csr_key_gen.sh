@@ -2,6 +2,7 @@ SUBINFO=/etc/certs/subjectinfo
 PASSFILE=/etc/certs/passwordfile
 FILE=/etc/certs/broker.key
 FILE2=/etc/certs/broker.csr
+RSUIP=
 
 # Creates the file containing the password for generating key and certificate
 if ! test -e "$PASSFILE"; then
@@ -10,7 +11,7 @@ fi
 
 # Creates the file containing the broker info for generating key and certificate
 if ! test -e "$SUBINFO"; then
-    echo "UK,Manchester,Greater Manchester,vanet,vanet-broker,brokerID" | sudo tee -a $SUBINFO > /dev/null
+    echo "UK,Manchester,Greater Manchester,vanet,vanet-broker,$RSUIP" | sudo tee -a $SUBINFO > /dev/null
 fi
 
 while IFS="," read -r f1 f2 f3 f4 f5 f6
