@@ -1,13 +1,14 @@
 import time
 import paho.mqtt.client as paho
-import hashlib, ssl, requests, pickle, json, threading, logging
+import hashlib, ssl, requests, pickle, argparse, json, threading, logging
 import pandas as pd
 import concurrent.futures
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s', filename='/var/log/mqttsubscriber.log')
 
 # Connection parameters
-broker = "Broker IP"
+with open ("/etc/mqtt/ip_address", "r") as ip_address:
+    broker = ip_address.readline()
 port = 8883
 root_ca = "/etc/mqtt/ca.crt"
 client_crt = "/etc/mqtt/" + broker + ".crt"

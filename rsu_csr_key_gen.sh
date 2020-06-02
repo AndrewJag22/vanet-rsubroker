@@ -1,4 +1,4 @@
-RSUIP=
+RSUIP=$1
 SUBINFO=/etc/mqtt/subjectinfo
 PASSFILE=/etc/mqtt/passwordfile
 FILE=/etc/mqtt/$RSUIP.key

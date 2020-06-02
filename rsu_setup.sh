@@ -1,6 +1,7 @@
 BLOCKCHAINDIR=/etc/blockchain
 CERTDIR=/etc/mqtt
-RSUIP=
+RSUIP=$1
+CASERVERIP=$2
 
 if test -e "$BLOCKCHAINDIR"; then
     echo "/etc/blockchain directory already exists"
@@ -16,8 +17,11 @@ else
     echo "Created /etc/mqtt directory"
 fi
 
+# Creates file containing RSU IP address
+echo "$RSUIP" > /etc/mqtt/ip_address
+
 # Installing dependencies
-apt-get install -y mosquitto python3-flask python3-pandas python3-ecdsa sshpass python3-pip expect
+apt-get install -y mosquitto python3-flask python3-pandas python3-ecdsa sshpass python3-pip expect argparse
 sudo -H pip3 install paho-mqtt
 
 # Creates copies of mqtt broker and subscriber and, blockchain executable files
@@ -40,10 +44,10 @@ chmod +x /etc/blockchain/sub_script.exp
 python3 private_key_generator.py
 
 # Creates the rsu's key and csr for mqtt connection
-./rsu_csr_key_gen.sh
+./rsu_csr_key_gen.sh $RSUIP
 
 # Sends the created crs to the CA for certification
-./mqttrsuca.sh
+./mqttrsuca.sh $RSUIP $CASERVERIP
 
 # Copies services to /lib/systemd/system folder
 cp rsu_blockchain.service /lib/systemd/system/rsu_blockchain.service
