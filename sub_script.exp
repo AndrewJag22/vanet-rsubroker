@@ -43,7 +43,7 @@ if {$force_conservative} {
 
 
 set timeout -1
-spawn python3 /etc/blockchain/mqtt_subscriber_setup.py
+spawn python3 /etc/mqtt/mqtt_subscriber_setup.py
 match_max 100000
 expect -exact "Enter PEM pass phrase:"
 send -- "password\r"

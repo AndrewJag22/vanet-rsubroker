@@ -26,8 +26,8 @@ sudo -H pip3 install paho-mqtt
 
 # Creates copies of mqtt broker and subscriber and, blockchain executable files
 cp broker.exp /etc/mosquitto/broker.exp
-cp sub_script.exp /etc/blockchain/sub_script.exp
-cp mqtt_subscriber_setup.py /etc/blockchain/mqtt_subscriber_setup.py
+cp sub_script.exp /etc/mqtt/sub_script.exp
+cp mqtt_subscriber_setup.py /etc/mqtt/mqtt_subscriber_setup.py
 cp rsu_blockchain.py /etc/blockchain/rsu_blockchain.py
 cp rsu_csr_key_gen.sh /etc/mqtt/rsu_csr_key_gen.sh
 cp mqttrsuca.sh /etc/mqtt/mqttrsuca.sh
@@ -38,7 +38,7 @@ chmod +x mqttrsuca.sh
 chmod +x /etc/mqtt/rsu_csr_key_gen.sh
 chmod +x /etc/mqtt/mqttrsuca.sh
 chmod +x /etc/mosquitto/broker.exp
-chmod +x /etc/blockchain/sub_script.exp
+chmod +x /etc/mqtt/sub_script.exp
 
 # Generates private key used for blockchain
 python3 private_key_generator.py
