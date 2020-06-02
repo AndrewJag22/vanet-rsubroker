@@ -1,5 +1,5 @@
 BLOCKCHAINDIR=/etc/blockchain
-CERTDIR=/etc/certs
+CERTDIR=/etc/mqtt
 RSUIP=
 
 if test -e "$BLOCKCHAINDIR"; then
@@ -10,10 +10,10 @@ else
 fi
 
 if test -e "$CERTDIR"; then
-    echo "/etc/certs directory already exists"
+    echo "/etc/mqtt directory already exists"
 else
     mkdir "$CERTDIR"
-    echo "Created /etc/certs directory"
+    echo "Created /etc/mqtt directory"
 fi
 
 # Installing dependencies
@@ -25,14 +25,14 @@ cp broker.exp /etc/mosquitto/broker.exp
 cp sub_script.exp /etc/blockchain/sub_script.exp
 cp mqtt_subscriber_setup.py /etc/blockchain/mqtt_subscriber_setup.py
 cp rsu_blockchain.py /etc/blockchain/rsu_blockchain.py
-cp rsu_csr_key_gen.sh /etc/certs/rsu_csr_key_gen.sh
-cp mqttrsuca.sh /etc/certs/mqttrsuca.sh
+cp rsu_csr_key_gen.sh /etc/mqtt/rsu_csr_key_gen.sh
+cp mqttrsuca.sh /etc/mqtt/mqttrsuca.sh
 
 # Adds executable attribute to scripts
 chmod +x rsu_csr_key_gen.sh
 chmod +x mqttrsuca.sh
-chmod +x /etc/certs/rsu_csr_key_gen.sh
-chmod +x /etc/certs/mqttrsuca.sh
+chmod +x /etc/mqtt/rsu_csr_key_gen.sh
+chmod +x /etc/mqtt/mqttrsuca.sh
 chmod +x /etc/mosquitto/broker.exp
 chmod +x /etc/blockchain/sub_script.exp
 
@@ -51,7 +51,7 @@ cp sub_script.service /lib/systemd/system/sub_script.service
 cp broker.service /lib/systemd/system/broker.service
 
 # Mosquitto broker configuration
-echo -e "\nallow_anonymous false\n\nacl_file /etc/mosquitto/aclfile\n\nport 8883\n\n#ssl settings\ncafile /etc/certs/ca.crt\nkeyfile /etc/certs/$RSUIP.key\ncertfile /etc/certs/$RSUIP.crt\ntls_version tlsv1.2\n\nrequire_certificate true\nuse_identity_as_username true" >> /etc/mosquitto/mosquitto.conf
+echo -e "\nallow_anonymous false\n\nacl_file /etc/mosquitto/aclfile\n\nport 8883\n\n#ssl settings\ncafile /etc/mqtt/ca.crt\nkeyfile /etc/mqtt/$RSUIP.key\ncertfile /etc/mqtt/$RSUIP.crt\ntls_version tlsv1.2\n\nrequire_certificate true\nuse_identity_as_username true" >> /etc/mosquitto/mosquitto.conf
 echo -e "#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser $RSUIP\ntopic readwrite vanet/messages" > /etc/mosquitto/aclfile
 
 # Creates cron jobs to perform mqtt broker and subscriber setup and run the blockchain whenever the server is put on

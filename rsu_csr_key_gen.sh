@@ -1,8 +1,8 @@
 RSUIP=
-SUBINFO=/etc/certs/subjectinfo
-PASSFILE=/etc/certs/passwordfile
-FILE=/etc/certs/$RSUIP.key
-FILE2=/etc/certs/$RSUIP.csr
+SUBINFO=/etc/mqtt/subjectinfo
+PASSFILE=/etc/mqtt/passwordfile
+FILE=/etc/mqtt/$RSUIP.key
+FILE2=/etc/mqtt/$RSUIP.csr
 
 
 # Creates the file containing the password for generating key and certificate
