@@ -1,10 +1,12 @@
-import time
+import time, sys
 import paho.mqtt.client as paho
 import hashlib, ssl, requests, pickle, argparse, json, threading, logging
 import pandas as pd
 import concurrent.futures
 
+# For creating logs
 logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s', filename='/var/log/mqttsubscriber.log')
+logger = logging.getLogger(__name__)
 
 # Connection parameters
 with open ("/etc/mqtt/ip_address", "r") as ip_address:
@@ -21,32 +23,34 @@ def on_message(client, userdata, message):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future = executor.submit(message_to_blockchain, message)
         return_value = future.result()
-        logging.info(return_value)
+        print(return_value)
+        if return_value[0] != 'No response':
+            logging.info('Post status: ' + return_value[0].status_code.__str__() + ', Time taken to add transaction: ' + return_value[2].__str__())
+        else:
+            logging.info('Post status: ' + return_value[0] + ', Errors: ' + return_value[1].__str__())
 
 # Method for uploading to the blockchain
 def message_to_blockchain(message):
     start_time = time.time()
-    logging.info("Received message")
+    error = 'None'
+    response = 'No response'
+    end_time = ''
     try:
         df = pickle.loads(message.payload)
-        payload = json.dumps({"MessageBody": df.set_index('Element')['Value'].to_dict()})
+        payload = json.dumps({'MessageBody': df.set_index('Element')['Value'].to_dict()})
         headers = {'content-type': 'application/json'}
         response = requests.post('http://localhost:5000/new_transaction',
                                data=payload, headers=headers)
-        logging.info("Time taken to process message to blockchain " + time.time()-start_time)
-        if "Success" in response:
-            return "Successfully added transaction to blockchain"
-        else:
-            return response
+        end_time = time.time() - start_time
     except:
-        return "There was a problem"
+        error = sys.exc_info()[1]
     finally:
-        return "Thread is closed"
+        return [response, error, end_time]
    
 
 
 
-client= paho.Client()  
+client = paho.Client()  
 client.on_message=on_message
 client.mid_value=None
 client.tls_set(ca_certs=root_ca,
@@ -55,6 +59,10 @@ client.tls_set(ca_certs=root_ca,
             cert_reqs=ssl.CERT_REQUIRED,
             tls_version=ssl.PROTOCOL_TLSv1_2,
             ciphers=None)
+
+client.enable_logger(logger)
+
+client.username_pw_set('blockchainclient',password='blockchain')
 
 print("Connecting to broker",broker)
 client.connect(broker, port)

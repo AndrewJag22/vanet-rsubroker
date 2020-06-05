@@ -59,15 +59,17 @@ cp sub_script.service /lib/systemd/system/sub_script.service
 cp broker.service /lib/systemd/system/broker.service
 
 # Mosquitto broker configuration
-echo -e "\nallow_anonymous false\n\nacl_file /etc/mosquitto/aclfile\n\nport 8883\n\n#ssl settings\ncafile /etc/mqtt/ca.crt\nkeyfile /etc/mqtt/$RSUIP.key\ncertfile /etc/mqtt/$RSUIP.crt\ntls_version tlsv1.2\n\nrequire_certificate true\nuse_identity_as_username true" >> /etc/mosquitto/mosquitto.conf
-echo -e "#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser $RSUIP\ntopic readwrite vanet/messages" > /etc/mosquitto/aclfile
+echo -e "\nallow_anonymous true\n\nacl_file /etc/mosquitto/aclfile\n\npassword_file /etc/mosquitto/passwordfile\n\nport 8883\n\n#ssl settings\ncafile /etc/mqtt/ca.crt\nkeyfile /etc/mqtt/$RSUIP.key\ncertfile /etc/mqtt/$RSUIP.crt\ntls_version tlsv1.2\n\nrequire_certificate true" >> /etc/mosquitto/mosquitto.conf
+echo -e "#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser blockchainclient\ntopic readwrite vanet/messages" > /etc/mosquitto/aclfile
+echo -e "blockchainclient:blockchain" > /etc/mosquitto/passwordfile
+mosquitto_passwd -U /etc/mosquitto/passwordfile
 
 # Creates cron jobs to perform mqtt broker and subscriber setup and run the blockchain whenever the server is put on
 crontab -l > current_cron
 cat >> current_cron << EOF
+@reboot systemctl start broker.service
 @reboot systemctl start sub_script.service
 @reboot systemctl start rsu_blockchain.service
-@reboot systemctl start broker.service
 EOF
 crontab < current_cron
 rm -f current_cron
