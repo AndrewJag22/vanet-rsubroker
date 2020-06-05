@@ -9,13 +9,13 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: 
 logger = logging.getLogger(__name__)
 
 # Connection parameters
-with open ("/etc/mqtt/ip_address", "r") as ip_address:
+with open ('/etc/mqtt/ip_address', 'r') as ip_address:
     broker = ip_address.readline().rstrip('\n')
 port = 8883
-root_ca = "/etc/mqtt/ca.crt"
-client_crt = "/etc/mqtt/" + broker + ".crt"
-private_key = "/etc/mqtt/" + broker + ".key"
-topic = "vanet/messages"
+root_ca = '/etc/mqtt/ca.crt'
+client_crt = '/etc/mqtt/' + broker + '.crt'
+private_key = '/etc/mqtt/' + broker + '.key'
+topic = 'vanet/messages'
 
 # Method called when a new message has been received from broker
 def on_message(client, userdata, message):
@@ -64,10 +64,10 @@ client.enable_logger(logger)
 
 client.username_pw_set('blockchainclient',password='blockchain')
 
-print("Connecting to broker",broker)
+print('Connecting to broker',broker)
 client.connect(broker, port)
 
-print("Subscribing to", topic)
+print('Subscribing to', topic)
 client.subscribe(topic)
 
 # Keeps the client alive
