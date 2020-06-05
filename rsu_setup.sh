@@ -3,22 +3,22 @@ CERTDIR=/etc/mqtt
 RSUIP=$1
 CASERVERIP=$2
 
-if test -e '$BLOCKCHAINDIR'; then
-    echo '/etc/blockchain directory already exists'
+if test -e "$BLOCKCHAINDIR"; then
+    echo "/etc/blockchain directory already exists"
 else
-    mkdir '$BLOCKCHAINDIR'
-    echo 'Created /etc/blockchain directory'
+    mkdir "$BLOCKCHAINDIR"
+    echo "Created /etc/blockchain directory"
 fi
 
-if test -e '$CERTDIR'; then
-    echo '/etc/mqtt directory already exists'
+if test -e "$CERTDIR"; then
+    echo "/etc/mqtt directory already exists"
 else
-    mkdir '$CERTDIR'
-    echo 'Created /etc/mqtt directory'
+    mkdir "$CERTDIR"
+    echo "Created /etc/mqtt directory"
 fi
 
 # Creates file containing RSU IP address
-echo '$RSUIP' > /etc/mqtt/ip_address
+echo "$RSUIP" > /etc/mqtt/ip_address
 
 # Adds CA Server to known hosts and makes sure there are no duplicates
 ssh-keygen -R $CASERVERIP
@@ -47,7 +47,7 @@ chmod +x /etc/mqtt/sub_script.exp
 # Generates private key used for blockchain
 python3 private_key_generator.py
 
-# Creates the rsu's key and csr for mqtt connection
+# Creates the rsu"s key and csr for mqtt connection
 ./rsu_csr_key_gen.sh $RSUIP
 
 # Sends the created crs to the CA for certification
@@ -59,9 +59,9 @@ cp sub_script.service /lib/systemd/system/sub_script.service
 cp broker.service /lib/systemd/system/broker.service
 
 # Mosquitto broker configuration
-echo -e '\nallow_anonymous true\n\nacl_file /etc/mosquitto/aclfile\n\npassword_file /etc/mosquitto/passwordfile\n\nport 8883\n\n#ssl settings\ncafile /etc/mqtt/ca.crt\nkeyfile /etc/mqtt/$RSUIP.key\ncertfile /etc/mqtt/$RSUIP.crt\ntls_version tlsv1.2\n\nrequire_certificate true' >> /etc/mosquitto/mosquitto.conf
-echo -e '#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser blockchainclient\ntopic readwrite vanet/messages' > /etc/mosquitto/aclfile
-echo -e 'blockchainclient:blockchain' > /etc/mosquitto/passwordfile
+echo -e "\nallow_anonymous true\n\nacl_file /etc/mosquitto/aclfile\n\npassword_file /etc/mosquitto/passwordfile\n\nport 8883\n\n#ssl settings\ncafile /etc/mqtt/ca.crt\nkeyfile /etc/mqtt/$RSUIP.key\ncertfile /etc/mqtt/$RSUIP.crt\ntls_version tlsv1.2\n\nrequire_certificate true" >> /etc/mosquitto/mosquitto.conf
+echo -e "#General rule to allow publishing\npattern write vanet/messages\n\n#Only for broker to subscribe to that topic\nuser blockchainclient\ntopic readwrite vanet/messages" > /etc/mosquitto/aclfile
+echo -e "blockchainclient:blockchain" > /etc/mosquitto/passwordfile
 mosquitto_passwd -U /etc/mosquitto/passwordfile
 
 # Creates cron jobs to perform mqtt broker and subscriber setup and run the blockchain whenever the server is put on
