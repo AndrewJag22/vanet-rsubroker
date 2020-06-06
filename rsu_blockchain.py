@@ -153,7 +153,8 @@ def register_new_peers():
         return 'Peer has been registered by another'
 
     # Return the blockchain to the newly registered node so that it can sync
-    data = get_chain()
+    data_dump = get_chain()
+    data = json.loads(data_dump)
     data['peers'] = peers
     return json.dumps(data)
 
@@ -170,13 +171,11 @@ def unregister_peer():
             return node_address + ' not in peers list'
         else:
             peers.remove(node_address)
-
-            data = {"node_address": request.host_url,
-                    "registration_status": "True"}
             headers = {'Content-Type': "application/json"}
 
-            for index, peer in enumerate(peers):
-                response = requests.post(peer + "/unregister_node", data=request.get_json(), headers=headers)
+            for peer in peers:
+                response = requests.post(peer + "unregister_node", data=request.get_json(), headers=headers)
+                logging.info(response.url + " " + response.content + " " + response.status_code)
         
             return 'Successfully unregistered ' + node_address, 200
 
@@ -195,7 +194,7 @@ def register_with_existing_node():
             'registration_status': 'False'}
     headers = {'Content-Type': 'application/json'}
 
-    response = requests.post(node_address + '/register_node',
+    response = requests.post(node_address + 'register_node',
                              data=json.dumps(data), headers=headers)
 
     if response.status_code == 200:
@@ -225,7 +224,7 @@ def register_with_existing_node():
 
         for peer in peers:
             if peer != node_address:
-                response = requests.post(peer + '/register_node',
+                response = requests.post(peer + 'register_node',
                                 data=json.dumps(data), headers=headers)
 
         return 'Registration successful', 200
@@ -234,7 +233,7 @@ def register_with_existing_node():
 
 
 def create_chain_from_dump(chain_dump):
-    blockchain.chain.pop()
+    blockchain.chain.clear()
     for index, block_data in enumerate(chain_dump):
         block = Block(block_data['timestamp'],
                       block_data['transactions'],
@@ -272,7 +271,7 @@ def announce_new_block(block):
     block_data = {'block': block.__dict__}
     headers = {'Content-Type': 'application/json'}
     for peer in peers:
-        url = '{}/add_block'.format(peer)
+        url = '{}add_block'.format(peer)
         requests.post(url, data=json.dumps(block_data), headers=headers)
 
 # Checks to see the longest chain the network
@@ -283,7 +282,7 @@ def consensus():
     current_len = len(blockchain.chain)
 
     for peer in peers:
-        response = requests.get('{}/chain'.format(peer))
+        response = requests.get('{}chain'.format(peer))
         length = response.json()['length']
         chain = response.json()['chain']
         if length > current_len and blockchain.check_chain_validity(chain):
