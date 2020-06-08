@@ -49,7 +49,7 @@ class Block:
             return False
 
         # Verifies the signature of the block hash    
-        return pub_key.verify(bytes.fromhex(self.block_signature), bytes(self.block_hash, 'utf-8'))
+        return ecdsa.VerifyingKey.from_string(bytes.fromhex(self.block_creator_public_key), curve=ecdsa.SECP256k1).verify(bytes.fromhex(self.block_signature), bytes(self.block_hash, 'utf-8'))
 
 
 
