@@ -47,10 +47,10 @@ chmod +x /etc/mqtt/sub_script.exp
 # Generates private key used for blockchain
 python3 private_key_generator.py
 
-# Creates the rsu"s key and csr for mqtt connection
+# Creates the rsu's key and csr for mqtt connection
 ./rsu_csr_key_gen.sh $RSUIP
 
-# Sends the created crs to the CA for certification
+# Sends the created csr to the CA for certification
 ./mqttrsuca.sh $RSUIP $CASERVERIP
 
 # Copies services to /lib/systemd/system folder
